@@ -158,19 +158,40 @@ Runna is a running session tracking application consisting of a Go backend API a
 - Date/time formatting
 - Unit conversion helpers
 
+## Phase 2.5: Session Management Enhancements (Edit & Update)
+
+### 2.5.1 Backend Expansion
+- **GET /api/sessions/{id}** - Retrieve single session
+  - Logic to fetch session by ID from database
+  - Handle 404 if not found
+- **PUT /api/sessions/{id}** - Update existing session
+  - Request body: updated session data
+  - Update database record
+  - Update `updated_at` timestamp
+  - Return updated session
+- **Database Updates**
+  - Implement `GetSession` and `UpdateSession` query methods
+
+### 2.5.2 Frontend Edit Capability
+- **API Client Updates**
+  - Add `getSession(id)`
+  - Add `updateSession(id, data)`
+- **Edit Session Page** (`src/routes/edit/[id]/+page.svelte`)
+  - Reuse form layout from Create page, by extracting form layout from Create page into separate .svelte file
+  - Fetch session data on mount to pre-fill inputs
+  - Handle submission as update
+- **Overview Integration**
+  - Add "Edit" action/button to session list table (routes to edit page)
+
 ## Phase 3: Integration & Testing
 
 ### 3.1 Combined Docker Compose
-- Create root-level docker-compose.yml that orchestrates both services
-- Network configuration for inter-service communication
 - Volume mounts for development
 - Environment variable management
 
 ### 3.2 Testing
 - Backend:
   - Test database connection
-  - Test API endpoints with curl/Postman
-  - Validate CORS settings
 - Frontend:
   - Test form submission
   - Test data retrieval and display
@@ -191,7 +212,6 @@ Runna is a running session tracking application consisting of a Go backend API a
 ### 4.1 Environment Configuration
 - Document all required environment variables
 - Create .env.example files
-- Set up Turso database and obtain connection URL
 
 ### 4.2 Production Optimizations
 - Backend:
