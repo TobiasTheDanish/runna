@@ -183,13 +183,86 @@ Runna is a running session tracking application consisting of a Go backend API a
 - **Overview Integration**
   - Add "Edit" action/button to session list table (routes to edit page)
 
-## Phase 3: Integration & Testing
+## Phase 3: Goal Tracking
 
-### 3.1 Combined Docker Compose
+### 3.1 Backend Implementation
+
+#### Database Schema
+- **New Table**: `goals`
+  - `id` (INTEGER PRIMARY KEY AUTOINCREMENT)
+  - `target_distance` (REAL NOT NULL)
+  - `start_date` (DATETIME NOT NULL)
+  - `end_date` (DATETIME NOT NULL)
+  - `created_at` (DATETIME DEFAULT CURRENT_TIMESTAMP)
+  - `updated_at` (DATETIME DEFAULT CURRENT_TIMESTAMP)
+
+#### Models (`internal/models/goal.go`)
+- Create `Goal` struct mirroring the database table.
+- Create `CreateGoalRequest` struct for API input.
+- Create `GoalProgress` struct for response, including:
+  - `Goal` details
+  - `CurrentDistance` (sum of relevant session distances)
+  - `TargetDistance`
+  - `ProgressPercentage`
+  - `Status` (e.g., "On Track", "Behind", "Ahead")
+  - `Sessions` ([]Session) - List of sessions contributing to this goal
+
+#### Database Logic (`internal/database/database.go`)
+- Update `Init()` to create the `goals` table.
+- Implement `CreateGoal(req models.CreateGoalRequest) (*models.Goal, error)`
+- Implement `GetGoals() ([]models.Goal, error)`
+- Implement `DeleteGoal(id int) error`
+- Implement `GetGoal(id int) (*models.GoalProgress, error)`
+  - This method will fetch the goal details.
+  - Query sessions where `date >= goal.start_date` and `date <= goal.end_date`.
+  - Calculate progress metrics.
+  - Return the goal info, metrics, and the list of sessions.
+
+#### Handlers (`internal/handlers/handlers.go` & `goal_handlers.go`)
+- `CreateGoal`: POST `/api/goals`
+- `GetGoals`: GET `/api/goals` (Can return list of goals with their progress)
+- `GetGoal`: GET `/api/goals/{id}` (Returns single goal details + contributing sessions)
+- `DeleteGoal`: DELETE `/api/goals/{id}`
+
+#### Routing (`cmd/api/main.go`)
+- Register the new routes.
+
+### 3.2 Frontend Implementation
+
+#### API Client (`src/lib/api/client.ts`)
+- Add methods: `createGoal`, `getGoals`, `getGoal(id)`, `deleteGoal`.
+
+#### UI Components
+- **Goal Card Component**: Displays a single goal's progress.
+  - Visual indicator (e.g., progress bar).
+  - "On Track" status badge.
+- **Create Goal Form**:
+  - Inputs for Target Distance, Start Date, End Date.
+
+#### Pages
+- **Goals Dashboard (`src/routes/goals/+page.svelte`)**:
+  - Lists existing goals.
+  - Shows a "Create New Goal" button.
+- **Create Goal Page (`src/routes/goals/create/+page.svelte`)**:
+  - Hosts the Create Goal Form.
+- **Goal Details Page (`src/routes/goals/[id]/+page.svelte`)**:
+  - Displays the specific goal's progress card.
+  - **Sessions List**: A table/list view of all sessions that fall within this goal's time period (contributing to the total distance).
+  - Delete goal button.
+
+### 3.3 "On Track" Logic
+- `Expected Distance` = `Target Distance` * (`Days Elapsed` / `Total Duration in Days`)
+- `Status`:
+  - If `Current Distance` >= `Expected Distance`: "On Track"
+  - If `Current Distance` < `Expected Distance`: "Behind"
+
+## Phase 4: Integration & Testing
+
+### 4.1 Combined Docker Compose
 - Volume mounts for development
 - Environment variable management
 
-### 3.2 Testing
+### 4.2 Testing
 - Backend:
   - Test database connection
 - Frontend:
@@ -199,7 +272,7 @@ Runna is a running session tracking application consisting of a Go backend API a
 - Integration:
   - End-to-end flow: create session and verify it appears in overview
 
-### 3.3 Documentation
+### 4.3 Documentation
 - README for each repository with:
   - Setup instructions
   - Environment variable requirements
@@ -207,13 +280,13 @@ Runna is a running session tracking application consisting of a Go backend API a
   - API documentation (for backend)
 - Development workflow documentation
 
-## Phase 4: Deployment Preparation
+## Phase 5: Deployment Preparation
 
-### 4.1 Environment Configuration
+### 5.1 Environment Configuration
 - Document all required environment variables
 - Create .env.example files
 
-### 4.2 Production Optimizations
+### 5.2 Production Optimizations
 - Backend:
   - Production logging configuration
   - Rate limiting
@@ -224,10 +297,12 @@ Runna is a running session tracking application consisting of a Go backend API a
   - Static asset optimization
 
 ## Success Criteria
-- ✅ Backend API running in Docker with two functional endpoints
-- ✅ Frontend running in Docker with two pages (create, overview)
+- ✅ Backend API running in Docker with functional endpoints
+- ✅ Frontend running in Docker with create, overview, and goal pages
 - ✅ Successful creation of sessions via UI
 - ✅ Sessions display correctly filtered by date range
 - ✅ Both services can be started with docker-compose
 - ✅ Data persists in Turso database
 - ✅ Proper error handling and validation
+- ✅ Users can create distance-based goals
+- ✅ Users can view goal progress, "on track" status, and related sessions
