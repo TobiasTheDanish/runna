@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <circle cx="256" cy="256" r="256" fill="url(#bgGradient)"/>
+  
+  <!-- Define gradients -->
+  <defs>
+    <!-- Background gradient - works on both light and dark -->
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    
+    <!-- Motion trail gradient -->
+    <linearGradient id="trailGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.3)"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Motion trails (suggesting speed/running) -->
+  <path d="M120 180 L200 180" stroke="url(#trailGradient)" stroke-width="12" stroke-linecap="round" opacity="0.6"/>
+  <path d="M100 240 L180 240" stroke="url(#trailGradient)" stroke-width="12" stroke-linecap="round" opacity="0.4"/>
+  <path d="M120 300 L200 300" stroke="url(#trailGradient)" stroke-width="12" stroke-linecap="round" opacity="0.6"/>
+  
+  <!-- Stylized "R" with dynamic design -->
+  <g transform="translate(256, 256)">
+    <!-- Main vertical stroke of R -->
+    <path d="M-60 -120 L-60 120" stroke="white" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- Top curve of R -->
+    <path d="M-60 -120 L-60 -60 Q-60 -20 -20 -20 L40 -20 Q80 -20 80 20 Q80 60 40 60 L-60 60" 
+          stroke="white" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- Leg of R (suggesting running motion) -->
+    <path d="M-20 30 L60 120" stroke="white" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- Dynamic accent dots (suggesting motion/energy) -->
+    <circle cx="100" cy="130" r="8" fill="white" opacity="0.8"/>
+    <circle cx="120" cy="145" r="6" fill="white" opacity="0.6"/>
+  </g>
+</svg>
